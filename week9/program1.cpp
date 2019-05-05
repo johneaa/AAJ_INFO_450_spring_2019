@@ -1,148 +1,147 @@
-
-
-// Feel like I'm really close with this, but I'm not fulling grasping the virtual function concept here...
-
+// I did a thing!!
 
 #include "pch.h"
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
 #include <fstream>
+#include <cstdlib>
+#include <string>
 
 using namespace std;
 
 class road_vehicle {
 
 public:
-	int wheels = NULL;
-	int passengers = NULL;
+	int wheels = 0;
+	int passengers = 0;
 	int cargo;
 	char car_type[15];
-	road_vehicle();
-	road_vehicle(road_vehicle& theObject);
-	virtual void print(ostream& os) {
-		os << wheels << endl;
-		os << passengers << endl;
+	road_vehicle() {}
+	road_vehicle(int w, int p) : wheels(w), passengers(p) {}
+	virtual void print() {
+		cout << wheels << endl;
+		cout << passengers << endl;
 	}
-	virtual void get(istream& is) {
+	virtual void get() {
 		cout << "How many wheels does this vehicle have?" << endl;
-		is >> wheels;
+		cin >> wheels;
 		cout << "How many passengers can this vehicle hold?" << endl;
-		is >> passengers;
+		cin >> passengers;
 	}
-	friend istream& operator >>(istream& inStream, road_vehicle& object);
-	friend ostream& operator <<(ostream& outStream, road_vehicle& object);
+
 };
-road_vehicle::road_vehicle() {
-
-}
-
 
 class truck : public road_vehicle {
 private:
-	
-public:
-	int cargo;
-	truck();
-	truck(truck& object);
-	void print(ostream& os) {
-		os << "truck";
-		road_vehicle::print(os);
-		os << cargo;
-	}
-	void get(istream& is) {
 
-		road_vehicle::get(is);
+public:
+	const string vtype = "truck\n";
+	int cargo;
+	truck() {}
+	truck(string const v, int w, int p, int c) : vtype(v), road_vehicle(w, p), cargo(c) {}
+	void print() {
+		ofstream out;
+		out.open("output.txt", ios::app);
+		out << vtype;
+		out << wheels << endl;
+		out << passengers << endl;
+		out << cargo << endl;
+		return;
+	}
+	void get() {
+
+		road_vehicle::get();
 		cout << "How much cargo (in pounds) can this vehicle hold?" << endl;
-		is >> cargo;
+		cin >> cargo;
 	}
 
 };
-truck::truck() {
-
-}
-
 
 class automobile : public road_vehicle {
 private:
-	
+
 public:
-	char car_type[15];
-	automobile();
-	automobile(automobile& object);
-	void print(ostream& os) {
-		os << "automobile\n";
-		road_vehicle::print(os);
-		os << car_type;
+	const string vtype = "automobile\n";
+	string car_type;
+	automobile(string const v, int w, int p, string c) : vtype(v), road_vehicle(w, p), car_type(c) {}
+	automobile() {}
+	void print() {
+		ofstream out;
+		out.open("output.txt", ios::app);
+		out << vtype;
+		out << wheels << endl;
+		out << passengers << endl;
+		out << car_type << endl;
 	}
-	void get(istream& is) {
+	void get() {
 
-		road_vehicle::get(is);
+		road_vehicle::get();
 		cout << "What type of automobile is this?   Enter van, car or wagon" << endl;
-		is >> car_type;
+		cin >> car_type;
 	}
-
 
 };
-automobile::automobile() {
 
-}
-class node
+struct node
+{
+	road_vehicle *data;
+	node *next;
+};
+
+class list
 {
 public:
+	node *head, *tail;
 
-	road_vehicle object;
-	automobile a;
-	truck t;
-	
-	node *next;
-	friend ostream& operator<<(ostream& outStream, road_vehicle& object);
-	node()
+	list()
 	{
-		next = NULL;
+		head = NULL;
+		tail = NULL;
 	}
-	void insert(road_vehicle &a);
-	void print_data();
+
+	void createnode(road_vehicle *v);
+	void display();
 };
-void node::print_data() {
-	cout << object;
 
-	if (next != NULL) {
-		next->print_data();
+void list::createnode(road_vehicle *v)
+{
+	node *temp = new node;
+	temp->data = v;
+	temp->next = NULL;
+	if (head == NULL)
+	{
+		head = temp;
+		tail = temp;
+		temp = NULL;
+	}
+	else
+	{
+		tail->next = temp;
+		tail = temp;
 	}
 }
-void node::insert(road_vehicle &v) {
-	if (next == NULL) {
-		next = new node;
-		next->object = v;
+
+void list::display()
+{
+	node *temp = new node;
+	temp = head;
+	while (temp != NULL)
+	{
+		temp->data->print();
+		temp = temp->next;
 	}
-	else 
-		next->insert(v);
-}
 
-istream& operator>>(istream& inStream, road_vehicle& object) {
-	object.get(inStream);
-	return inStream;
-}
-
-ostream& operator<<(ostream& outStream, road_vehicle& object) {
-	object.print(outStream);
-	return outStream;
 }
 
 int main() {
-	
-	road_vehicle v;
+
 	truck tr;
 	automobile au;
-	node linkedlist;
+	list l;
 
 	char input[15];
 	char response[4];
-
-	ofstream out;
-	out.open("output.txt");
-
 
 	do {
 
@@ -157,22 +156,28 @@ int main() {
 
 
 		if (!strcmp(input, "automobile")) {
-			cin >> au;
-			linkedlist.insert(au);
+			road_vehicle *vauto = new automobile;
+			vauto->get();
+			l.createnode(vauto);
 		}
 		else {
-			cin >> tr;
-			linkedlist.insert(tr);
-
-
+			road_vehicle *vtruck = new truck;
+			vtruck->get();
+			l.createnode(vtruck);
 		}
 		cout << "Would you like to enter another vehicle? yes or no " << endl;
 		cin >> response;
 
 	} while (strcmp(response, "no"));
+	
+	l.display();
 
-	linkedlist.print_data();
-	out.close();
+	ofstream out;
+	out.close;
+
+	cout << "\nYour vehicles have been saved in the file, 'output.txt'" << endl;
+
+
 
 	return 0;
 
