@@ -156,12 +156,12 @@ int main() {
 
 
 		if (!strcmp(input, "automobile")) {
-			road_vehicle *vauto = new automobile;
+			automobile *vauto = new automobile;
 			vauto->get();
 			l.createnode(vauto);
 		}
 		else {
-			road_vehicle *vtruck = new truck;
+			truck *vtruck = new truck;
 			vtruck->get();
 			l.createnode(vtruck);
 		}
@@ -173,7 +173,7 @@ int main() {
 	l.display();
 
 	ofstream out;
-	out.close;
+	out.close();
 
 	cout << "\nYour vehicles have been saved in the file, 'output.txt'" << endl;
 
